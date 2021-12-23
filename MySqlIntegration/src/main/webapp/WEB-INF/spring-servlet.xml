@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:cache="http://www.springframework.org/schema/cache"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd  http://www.springframework.org/schema/cache 
+        http://www.springframework.org/schema/cache/spring-cache-3.2.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+       
+        <context:component-scan base-package="com.testpoc.controller"/>
+
+<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dataSource">
+    <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+    <property name="url" value="jdbc:mysql://localhost:3306/sample_apache"></property>
+    <property name="username" value="root"></property>
+    <property name="password" value="root"></property>
+	<property name="peerClassLoadingEnabled" value="true"/>
+
+</bean>
+
+<bean class="org.apache.ignite.configuration.IgniteConfiguration" id="ignite.cfg">
+    <property name="cacheConfiguration">
+        <list>
+            <bean class="org.apache.ignite.configuration.CacheConfiguration">
+                <property name="name" value="personCache"></property>
+                <!-- Enable readThrough-->
+                <property name="readThrough" value="true"></property>
+                <property name="writeThrough" value="true"></property>
+                <!-- Set cacheStoreFactory-->
+                <property name="cacheStoreFactory">
+                    <bean class="javax.cache.configuration.FactoryBuilder" factory-method="factoryOf">
+                        <constructor-arg value="com.xoriant.service.PersonStore"></constructor-arg>
+                    </bean>
+                </property>
+                <property name="queryEntities">
+                    <list>
+                        <bean class="org.apache.ignite.cache.QueryEntity">
+                            <property name="keyType" value="java.lang.Integer"></property>
+                            <property name="valueType" value="ignite.myexamples.model.Person"></property>
+                            <property name="fields">
+                                <map>
+                                    <entry key="id" value="java.lang.Integer"></entry>
+                                    <entry key="name" value="java.lang.String"></entry>
+                                </map>
+                            </property>
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </list>
+    </property>
+
+    <property name="peerClassLoadingEnabled" value="true"></property>
+
+    <!-- Other Ignite configurations-->
+    
+
+</bean>
+
+</beans>
